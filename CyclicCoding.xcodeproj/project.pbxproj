@@ -10,6 +10,11 @@
 		372BDBC72129F13800E767AD /* CyclicCoding.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 372BDBBD2129F13800E767AD /* CyclicCoding.framework */; };
 		372BDBCC2129F13800E767AD /* CyclicCodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372BDBCB2129F13800E767AD /* CyclicCodingTests.swift */; };
 		372BDBCE2129F13800E767AD /* CyclicCoding.h in Headers */ = {isa = PBXBuildFile; fileRef = 372BDBC02129F13800E767AD /* CyclicCoding.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		372BDBD82129F1BD00E767AD /* CyclicEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372BDBD72129F1BD00E767AD /* CyclicEncoder.swift */; };
+		372BDBDC2129FDF700E767AD /* Primitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372BDBDB2129FDF700E767AD /* Primitive.swift */; };
+		372BDBE0212A80AA00E767AD /* Box.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372BDBDF212A80AA00E767AD /* Box.swift */; };
+		3792D8B5212BD65200E68277 /* CyclicDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3792D8B4212BD65200E68277 /* CyclicDecoder.swift */; };
+		37FEA54521F20501008112AD /* CycleBreaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FEA54421F20501008112AD /* CycleBreaker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,6 +34,11 @@
 		372BDBC62129F13800E767AD /* CyclicCodingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CyclicCodingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		372BDBCB2129F13800E767AD /* CyclicCodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CyclicCodingTests.swift; sourceTree = "<group>"; };
 		372BDBCD2129F13800E767AD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		372BDBD72129F1BD00E767AD /* CyclicEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CyclicEncoder.swift; sourceTree = "<group>"; };
+		372BDBDB2129FDF700E767AD /* Primitive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Primitive.swift; sourceTree = "<group>"; };
+		372BDBDF212A80AA00E767AD /* Box.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Box.swift; sourceTree = "<group>"; };
+		3792D8B4212BD65200E68277 /* CyclicDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CyclicDecoder.swift; sourceTree = "<group>"; };
+		37FEA54421F20501008112AD /* CycleBreaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleBreaker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +82,11 @@
 			isa = PBXGroup;
 			children = (
 				372BDBC02129F13800E767AD /* CyclicCoding.h */,
+				372BDBDF212A80AA00E767AD /* Box.swift */,
+				37FEA54421F20501008112AD /* CycleBreaker.swift */,
+				372BDBD72129F1BD00E767AD /* CyclicEncoder.swift */,
+				3792D8B4212BD65200E68277 /* CyclicDecoder.swift */,
+				372BDBDB2129FDF700E767AD /* Primitive.swift */,
 				372BDBC12129F13800E767AD /* Info.plist */,
 			);
 			path = CyclicCoding;
@@ -108,6 +123,7 @@
 				372BDBB92129F13800E767AD /* Sources */,
 				372BDBBA2129F13800E767AD /* Frameworks */,
 				372BDBBB2129F13800E767AD /* Resources */,
+				3792D8C6212D929A00E68277 /* Warn for TODO and FIXME */,
 			);
 			buildRules = (
 			);
@@ -148,6 +164,7 @@
 				TargetAttributes = {
 					372BDBBC2129F13800E767AD = {
 						CreatedOnToolsVersion = 10.0;
+						LastSwiftMigration = 1000;
 					};
 					372BDBC52129F13800E767AD = {
 						CreatedOnToolsVersion = 10.0;
@@ -189,11 +206,37 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		3792D8C6212D929A00E68277 /* Warn for TODO and FIXME */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Warn for TODO and FIXME";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "TAGS=\"TODO:|FIXME:\"\nfind \"${SRCROOT}\" \\( -name \"*.swift\" \\) -print0 | xargs -0 egrep --with-filename --line-number --only-matching \"($TAGS).*\\$\" | perl -p -e \"s/($TAGS)/ warning: \\$1/\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		372BDBB92129F13800E767AD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				372BDBE0212A80AA00E767AD /* Box.swift in Sources */,
+				372BDBD82129F1BD00E767AD /* CyclicEncoder.swift in Sources */,
+				372BDBDC2129FDF700E767AD /* Primitive.swift in Sources */,
+				3792D8B5212BD65200E68277 /* CyclicDecoder.swift in Sources */,
+				37FEA54521F20501008112AD /* CycleBreaker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -341,6 +384,7 @@
 		372BDBD22129F13800E767AD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
@@ -358,6 +402,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.mostlyinfinite.CyclicCoding;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/CyclicCoding/Module";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -366,6 +413,7 @@
 		372BDBD32129F13800E767AD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
@@ -383,6 +431,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.mostlyinfinite.CyclicCoding;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/CyclicCoding/Module";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -391,6 +441,7 @@
 		372BDBD52129F13800E767AD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = J67UWS3VAP;
 				INFOPLIST_FILE = CyclicCodingTests/Info.plist;
@@ -409,6 +460,7 @@
 		372BDBD62129F13800E767AD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = J67UWS3VAP;
 				INFOPLIST_FILE = CyclicCodingTests/Info.plist;

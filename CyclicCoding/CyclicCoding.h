@@ -15,5 +15,3 @@ FOUNDATION_EXPORT double CyclicCodingVersionNumber;
 FOUNDATION_EXPORT const unsigned char CyclicCodingVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <CyclicCoding/PublicHeader.h>
-
-
