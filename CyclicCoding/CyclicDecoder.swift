@@ -8,6 +8,11 @@
 
 import Foundation
 
+/// Decodes an object graph from a flattened representation, correctly reconstructing duplicate objects and cycles which use a cycle breaker.
+///
+/// - Deduplication: an object which is present once in the flattened representation and referenced multiple times will only be decoded once, and all calls to `decode` for that object will return the same instance.
+/// - Cycles in the object graph **cannot** be decoded unless a `WeakCycleBreaker` or `UnownedCycleBreaker` is used to break the cycle.
+///     - `CyclicEncoder` will not encode any cycles which cannot successfully be decoded. The only way an undecodable cycle could be present in the flattened representation is if it were manually created.
 public class CyclicDecoder {
     
     public func decode<T: Decodable>(_ type: T.Type, from flattened: FlattenedContainer) throws -> T {

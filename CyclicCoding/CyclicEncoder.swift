@@ -8,6 +8,13 @@
 
 import Foundation
 
+/// Encodes a given `Encodable` object graph, detecting duplicates and cycle, into a flattened representation suitable for serialisation.
+///
+/// - Deduplication: any object (`AnyObject`) which is present in object graph given multiple times will only be encoded once, and will be appropriately referenced everywhere else it appears.
+///     - Object identity is determined by `ObjectIdentifier`. Any custom equality operators that are or are not implemented will not affect encoding.
+///
+/// - Cycles in the object graph **cannot** be encoded as-is: use `WeakCycleBreaker` or `UnownedCycleBreaker` to break them.
+///     - If you attempt to encode an object graph containing a cycle without a cycle breaker, an error will be thrown.
 public class CyclicEncoder {
     
     public func flatten<T: Encodable>(_ value: T) throws -> FlattenedContainer {

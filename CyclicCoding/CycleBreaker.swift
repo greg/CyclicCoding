@@ -39,8 +39,6 @@ public struct WeakCycleBreaker<Object: AnyObject & Codable>: Codable {
         self.storage.object = object
     }
     
-    init(unfilled: ()) { }
-    
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if !container.decodeNil() {
@@ -72,6 +70,7 @@ public struct WeakCycleBreaker<Object: AnyObject & Codable>: Codable {
         }
     }
     
+    /// Use the subscript to access the object weakly referenced by the cycle breaker.
     public subscript() -> Object? {
         get {
             return storage.object
@@ -101,6 +100,7 @@ public struct UnownedCycleBreaker<Object: AnyObject & Codable>: Codable {
         try breaker.encode(to: encoder)
     }
     
+    /// Use the subscript to access the unowned object referenced by the cycle breaker.
     public subscript() -> Object {
         get {
             return breaker[]!
