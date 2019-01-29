@@ -6,7 +6,7 @@
 //  Copyright © 2018 Greg Omelaenko. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 //! Project version number for CyclicCoding.
 FOUNDATION_EXPORT double CyclicCodingVersionNumber;
