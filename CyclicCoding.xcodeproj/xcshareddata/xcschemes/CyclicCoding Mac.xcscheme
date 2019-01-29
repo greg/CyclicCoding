@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "37D852A5220016210026B865"
-               BuildableName = "CyclicCoding_Mac.framework"
+               BuildableName = "CyclicCoding.framework"
                BlueprintName = "CyclicCoding Mac"
                ReferencedContainer = "container:CyclicCoding.xcodeproj">
             </BuildableReference>
@@ -43,7 +43,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "37D852A5220016210026B865"
-            BuildableName = "CyclicCoding_Mac.framework"
+            BuildableName = "CyclicCoding.framework"
             BlueprintName = "CyclicCoding Mac"
             ReferencedContainer = "container:CyclicCoding.xcodeproj">
          </BuildableReference>
@@ -65,7 +65,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "37D852A5220016210026B865"
-            BuildableName = "CyclicCoding_Mac.framework"
+            BuildableName = "CyclicCoding.framework"
             BlueprintName = "CyclicCoding Mac"
             ReferencedContainer = "container:CyclicCoding.xcodeproj">
          </BuildableReference>
@@ -83,7 +83,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "37D852A5220016210026B865"
-            BuildableName = "CyclicCoding_Mac.framework"
+            BuildableName = "CyclicCoding.framework"
             BlueprintName = "CyclicCoding Mac"
             ReferencedContainer = "container:CyclicCoding.xcodeproj">
          </BuildableReference>
