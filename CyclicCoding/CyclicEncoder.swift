@@ -61,7 +61,6 @@ fileprivate final class _Encoder: Encoder {
             referenced = []
         }
         let root = try box(value)
-        // TODO: error handle properly
         return FlattenedContainer(referenced: referenced.map { $0.resolve() }, root: root.resolve())
     }
     
@@ -80,7 +79,7 @@ fileprivate final class _Encoder: Encoder {
         }
         else {
             guard case .keyed(let topContainer)? = containers.last else {
-                preconditionFailure("Attempt to push new keyed encoding container when already previously encoded at this path.")
+                preconditionFailure("USER ERROR: Attempt to push new keyed encoding container when already previously encoded at this path.")
             }
             container = topContainer
         }
@@ -95,7 +94,7 @@ fileprivate final class _Encoder: Encoder {
         }
         else {
             guard case .unkeyed(let topContainer)? = containers.last else {
-                preconditionFailure("Attempt to push new unkeyed encoding container when already previously encoded at this path.")
+                preconditionFailure("USER ERROR: Attempt to push new unkeyed encoding container when already previously encoded at this path.")
             }
             container = topContainer
         }
@@ -183,7 +182,7 @@ extension _Encoder {
                 return .deferred {
                     // this is a strong reference cycle, but will be broken when this closure is thrown away after encoding
                     guard let usage = self.objectUsage[id] else {
-                        preconditionFailure("Previously used object has disappeared from objectUsage table.")
+                        preconditionFailure("BUG: Previously used object has disappeared from objectUsage table.")
                     }
                     switch usage {
                     case .once(let value):
@@ -297,7 +296,7 @@ fileprivate struct KeyedContainerWrapper<Key>: KeyedEncodingContainerProtocol wh
         encoder.codingPath.append(key)
         defer { encoder.codingPath.removeLast() }
         guard container[][key.stringValue] == nil else {
-            preconditionFailure("Tried to encode duplicate entry for key \(key.stringValue): \(value).")
+            preconditionFailure("USER ERROR: Tried to encode duplicate entry for key \(key.stringValue): \(value).")
         }
         container[][key.stringValue] = try encoder.box(value)
     }
@@ -305,7 +304,7 @@ fileprivate struct KeyedContainerWrapper<Key>: KeyedEncodingContainerProtocol wh
     mutating func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type, forKey key: Key) -> KeyedEncodingContainer<NestedKey> where NestedKey : CodingKey {
         let nested = EncodingContainer.Keyed([:])
         guard container[][key.stringValue] == nil else {
-            preconditionFailure("Tried to encode duplicate entry for key \(key.stringValue).")
+            preconditionFailure("USER ERROR: Tried to encode duplicate entry for key \(key.stringValue).")
         }
         container[][key.stringValue] = .deferred {
             return .value(.keyed(nested[].mapValues { $0.resolve() }))
@@ -320,7 +319,7 @@ fileprivate struct KeyedContainerWrapper<Key>: KeyedEncodingContainerProtocol wh
     mutating func nestedUnkeyedContainer(forKey key: Key) -> UnkeyedEncodingContainer {
         let nested = EncodingContainer.Unkeyed([])
         guard container[][key.stringValue] == nil else {
-            preconditionFailure("Tried to encode duplicate entry for key \(key.stringValue).")
+            preconditionFailure("USER ERROR: Tried to encode duplicate entry for key \(key.stringValue).")
         }
         container[][key.stringValue] = .deferred {
             return .value(.unkeyed(nested[].map { $0.resolve() }))
@@ -337,13 +336,13 @@ fileprivate struct KeyedContainerWrapper<Key>: KeyedEncodingContainerProtocol wh
         defer { codingPath.removeLast() }
         
         guard container[][key.stringValue] == nil else {
-            preconditionFailure("Tried to encode duplicate entry for key \(key.stringValue).")
+            preconditionFailure("USER ERROR: Tried to encode duplicate entry for key \(key.stringValue).")
         }
         
         let superEncoder = SuperEncoder(encoder: encoder, codingPath: codingPath, wrapping: nil)
         container[][key.stringValue] = .deferred {
             guard let container = superEncoder.container else {
-                preconditionFailure("A super encoder was requested but nothing was encoded to it.")
+                preconditionFailure("USER ERROR: A super encoder was requested but nothing was encoded to it.")
             }
             return .value(container.finalise().resolve())
         }
@@ -459,7 +458,7 @@ fileprivate struct UnkeyedContainerWrapper: UnkeyedEncodingContainer {
         let superEncoder = SuperEncoder(encoder: encoder, codingPath: codingPath, wrapping: nil)
         container[].append(.deferred {
             guard let container = superEncoder.container else {
-                preconditionFailure("A super encoder was requested but nothing was encoded to it.")
+                preconditionFailure("USER ERROR: A super encoder was requested but nothing was encoded to it.")
             }
             return .value(container.finalise().resolve())
         })
@@ -518,7 +517,7 @@ fileprivate final class SuperEncoder: Encoder {
         let keyed: EncodingContainer.Keyed
         if let container = self.container {
             guard case .keyed(let k) = container else {
-                preconditionFailure("Attempt to push new keyed encoding container when already previously encoded at this path.")
+                preconditionFailure("USER ERROR: Attempt to push new keyed encoding container when already previously encoded at this path.")
             }
             keyed = k
         }
@@ -533,7 +532,7 @@ fileprivate final class SuperEncoder: Encoder {
         let unkeyed: EncodingContainer.Unkeyed
         if let container = self.container {
             guard case .unkeyed(let u) = container else {
-                preconditionFailure("Attempt to push new unkeyed encoding container when already previously encoded at this path.")
+                preconditionFailure("USER ERROR: Attempt to push new unkeyed encoding container when already previously encoded at this path.")
             }
             unkeyed = u
         }
@@ -547,12 +546,12 @@ fileprivate final class SuperEncoder: Encoder {
     func singleValueContainer() -> SingleValueEncodingContainer {
         if let container = self.container {
             guard case .single = container else {
-                preconditionFailure("Attempt to push new single value encoding container when already previously encoded at this path.")
+                preconditionFailure("USER ERROR: Attempt to push new single value encoding container when already previously encoded at this path.")
             }
         }
         else {
             self.container = .single(MutableBox(.deferred {
-                preconditionFailure("Nothing was encoded in the single value container.")
+                preconditionFailure("USER ERROR: Nothing was encoded in the single value container.")
             }))
         }
         return self
@@ -564,7 +563,7 @@ extension SuperEncoder: SingleValueEncodingContainer {
     
     private func assertCanEncodeSingleValue() {
         guard case .single(let box)? = container, case .deferred = box[] else {
-            preconditionFailure("Attempt to encode value thorugh single value container when value has already been encoded.")
+            preconditionFailure("USER ERROR: Attempt to encode value thorugh single value container when value has already been encoded.")
         }
     }
     

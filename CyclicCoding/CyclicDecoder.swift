@@ -51,14 +51,14 @@ fileprivate class _Decoder: Decoder {
     
     func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key : CodingKey {
         guard case .keyed(let container)? = containers.last else {
-            throw DecodingError._typeMismatch(at: codingPath, expectation: DecodingContainer.Keyed.self, reality: containers.last as Any)
+            throw DecodingError._containerMismatch(at: codingPath, expectation: .keyed, reality: containers.last)
         }
         return KeyedDecodingContainer(KeyedContainerWrapper(decoder: self, container: container))
     }
     
     func unkeyedContainer() throws -> UnkeyedDecodingContainer {
         guard case .unkeyed(let container)? = containers.last else {
-            throw DecodingError._typeMismatch(at: codingPath, expectation: DecodingContainer.Unkeyed.self, reality: containers.last as Any)
+            throw DecodingError._containerMismatch(at: codingPath, expectation: .unkeyed, reality: containers.last)
         }
         return UnkeyedContainerWrapper(decoder: self, container: container)
     }
@@ -71,16 +71,19 @@ fileprivate class _Decoder: Decoder {
 
 fileprivate extension DecodingError {
     
-    /// Returns a `.typeMismatch` error describing the expected type.
-    ///
-    /// - parameter path: The path of `CodingKey`s taken to decode a value of this type.
-    /// - parameter expectation: The type expected to be encountered.
-    /// - parameter reality: The value that was encountered instead of the expected type.
-    /// - returns: A `DecodingError` with the appropriate path and debug description.
-    // FIXME: basically everywhere this is used is a mess, the errors are not helpful
-    static func _typeMismatch(at path: [CodingKey], expectation: Any.Type, reality: Any) -> DecodingError {
+    static func _containerMismatch(at path: [CodingKey], expectation: DecodingContainer.Kind, reality: DecodingContainer?) -> DecodingError {
+        let description = "Expected to decode \(expectation) but found \(String(describing: reality)) instead."
+        return .typeMismatch(expectation.type, Context(codingPath: path, debugDescription: description))
+    }
+    
+    static func _containerMismatch(at path: [CodingKey], expectation: DecodingContainer.Kind, reality: Value) -> DecodingError {
+        let description = "Expected to decode \(expectation) but found \(String(describing: reality)) instead."
+        return .typeMismatch(expectation.type, Context(codingPath: path, debugDescription: description))
+    }
+    
+    static func _unboxMismatch(at path: [CodingKey], expectation: Any.Type, reality: Value) -> DecodingError {
         let description = "Expected to decode \(expectation) but found \(reality) instead."
-        return .typeMismatch(expectation, Context(codingPath: path, debugDescription: description))
+        return DecodingError.typeMismatch(expectation, Context(codingPath: path, debugDescription: description))
     }
     
 }
@@ -104,78 +107,88 @@ extension _Decoder {
         return true
     }
     
-    private func _unboxMismatch(_ boxed: ValueOrReference, _ expectation: Any.Type) -> DecodingError {
-        return DecodingError._typeMismatch(at: codingPath, expectation: expectation, reality: boxed)
-    }
-    
     func unbox(_ boxed: ValueOrReference, as: Bool.Type) throws -> Bool {
-        guard case .boolean(let value) = try unreferencedValue(boxed) else { throw _unboxMismatch(boxed, Bool.self) }
-        return value
+        let value = try unreferencedValue(boxed)
+        guard case .boolean(let unboxed) = value else { throw DecodingError._unboxMismatch(at: codingPath, expectation: Bool.self, reality: value) }
+        return unboxed
     }
     
     func unbox(_ boxed: ValueOrReference, as: String.Type) throws -> String {
-        guard case .string(let value) = try unreferencedValue(boxed) else { throw _unboxMismatch(boxed, String.self) }
-        return value
+        let value = try unreferencedValue(boxed)
+        guard case .string(let unboxed) = value else { throw DecodingError._unboxMismatch(at: codingPath, expectation: String.self, reality: value) }
+        return unboxed
     }
     
     func unbox(_ boxed: ValueOrReference, as: Double.Type) throws -> Double {
-        guard case .double(let value) = try unreferencedValue(boxed) else { throw _unboxMismatch(boxed, Double.self) }
-        return value
+        let value = try unreferencedValue(boxed)
+        guard case .double(let unboxed) = value else { throw DecodingError._unboxMismatch(at: codingPath, expectation: Double.self, reality: value) }
+        return unboxed
     }
     
     func unbox(_ boxed: ValueOrReference, as: Float.Type) throws -> Float {
-        guard case .float(let value) = try unreferencedValue(boxed) else { throw _unboxMismatch(boxed, Float.self) }
-        return value
+        let value = try unreferencedValue(boxed)
+        guard case .float(let unboxed) = value else { throw DecodingError._unboxMismatch(at: codingPath, expectation: Float.self, reality: value) }
+        return unboxed
     }
     
     func unbox(_ boxed: ValueOrReference, as: Int.Type) throws -> Int {
-        guard case .int(let value) = try unreferencedValue(boxed) else { throw _unboxMismatch(boxed, Int.self) }
-        return value
+        let value = try unreferencedValue(boxed)
+        guard case .int(let unboxed) = value else { throw DecodingError._unboxMismatch(at: codingPath, expectation: Int.self, reality: value) }
+        return unboxed
     }
     
     func unbox(_ boxed: ValueOrReference, as: Int8.Type) throws -> Int8 {
-        guard case .int8(let value) = try unreferencedValue(boxed) else { throw _unboxMismatch(boxed, Int.self) }
-        return value
+        let value = try unreferencedValue(boxed)
+        guard case .int8(let unboxed) = value else { throw DecodingError._unboxMismatch(at: codingPath, expectation: Int.self, reality: value) }
+        return unboxed
     }
     
     func unbox(_ boxed: ValueOrReference, as: Int16.Type) throws -> Int16 {
-        guard case .int16(let value) = try unreferencedValue(boxed) else { throw _unboxMismatch(boxed, Int16.self) }
-        return value
+        let value = try unreferencedValue(boxed)
+        guard case .int16(let unboxed) = value else { throw DecodingError._unboxMismatch(at: codingPath, expectation: Int16.self, reality: value) }
+        return unboxed
     }
     
     func unbox(_ boxed: ValueOrReference, as: Int32.Type) throws -> Int32 {
-        guard case .int32(let value) = try unreferencedValue(boxed) else { throw _unboxMismatch(boxed, Int32.self) }
-        return value
+        let value = try unreferencedValue(boxed)
+        guard case .int32(let unboxed) = value else { throw DecodingError._unboxMismatch(at: codingPath, expectation: Int32.self, reality: value) }
+        return unboxed
     }
     
     func unbox(_ boxed: ValueOrReference, as: Int64.Type) throws -> Int64 {
-        guard case .int64(let value) = try unreferencedValue(boxed) else { throw _unboxMismatch(boxed, Int64.self) }
-        return value
+        let value = try unreferencedValue(boxed)
+        guard case .int64(let unboxed) = value else { throw DecodingError._unboxMismatch(at: codingPath, expectation: Int64.self, reality: value) }
+        return unboxed
     }
     
     func unbox(_ boxed: ValueOrReference, as: UInt.Type) throws -> UInt {
-        guard case .uint(let value) = try unreferencedValue(boxed) else { throw _unboxMismatch(boxed, UInt.self) }
-        return value
+        let value = try unreferencedValue(boxed)
+        guard case .uint(let unboxed) = value else { throw DecodingError._unboxMismatch(at: codingPath, expectation: UInt.self, reality: value) }
+        return unboxed
     }
     
     func unbox(_ boxed: ValueOrReference, as: UInt8.Type) throws -> UInt8 {
-        guard case .uint8(let value) = try unreferencedValue(boxed) else { throw _unboxMismatch(boxed, UInt8.self) }
-        return value
+        let value = try unreferencedValue(boxed)
+        guard case .uint8(let unboxed) = value else { throw DecodingError._unboxMismatch(at: codingPath, expectation: UInt8.self, reality: value) }
+        return unboxed
     }
     
     func unbox(_ boxed: ValueOrReference, as: UInt16.Type) throws -> UInt16 {
-        guard case .uint16(let value) = try unreferencedValue(boxed) else { throw _unboxMismatch(boxed, UInt16.self) }
-        return value
+        let value = try unreferencedValue(boxed)
+        guard case .uint16(let unboxed) = value else { throw DecodingError._unboxMismatch(at: codingPath, expectation: UInt16.self, reality: value) }
+        return unboxed
     }
     
     func unbox(_ boxed: ValueOrReference, as: UInt32.Type) throws -> UInt32 {
-        guard case .uint32(let value) = try unreferencedValue(boxed) else { throw _unboxMismatch(boxed, UInt32.self) }
-        return value
+        let value = try unreferencedValue(boxed)
+        guard case .uint32(let unboxed) = value else { throw DecodingError._unboxMismatch(at: codingPath, expectation: UInt32.self, reality: value) }
+        return unboxed
     }
     
     func unbox(_ boxed: ValueOrReference, as: UInt64.Type) throws -> UInt64 {
-        guard case .uint64(let value) = try unreferencedValue(boxed) else { throw _unboxMismatch(boxed, UInt64.self) }
-        return value
+        let value = try unreferencedValue(boxed)
+        guard case .uint64(let unboxed) = value else { throw DecodingError._unboxMismatch(at: codingPath, expectation: UInt64.self, reality: value) }
+        return unboxed
     }
     
     private func actuallyUnbox<T: Decodable>(_ value: Value, as type: T.Type) throws -> T {
@@ -196,7 +209,7 @@ extension _Decoder {
         case .reference(let index):
             let convertingCompletion: (AnyObject) throws -> Void = { [unowned self] in
                 guard let object = $0 as? T else {
-                    throw self._unboxMismatch(boxed, T.self)
+                    throw DecodingError.typeMismatch(type, DecodingError.Context(codingPath: self.codingPath, debugDescription: "Expected to decode \(type) but found \($0), decoded from: \(boxed)."))
                 }
                 completion(object)
             }
@@ -250,6 +263,28 @@ fileprivate enum DecodingContainer {
     case keyed(Keyed)
     case unkeyed(Unkeyed)
     case single(Single)
+    
+    enum Kind: CustomStringConvertible {
+        case keyed
+        case unkeyed
+        case single
+        
+        var type: Any.Type {
+            switch self {
+            case .keyed: return Keyed.self
+            case .unkeyed: return Unkeyed.self
+            case .single: return Single.self
+            }
+        }
+        
+        var description: String {
+            switch self {
+            case .keyed: return "keyed decoding container"
+            case .unkeyed: return "unkeyed decoding container"
+            case .single: return "single value decoding container"
+            }
+        }
+    }
     
     init(_ value: Value) {
         switch value {
@@ -330,7 +365,7 @@ fileprivate struct KeyedContainerWrapper<Key>: KeyedDecodingContainerProtocol wh
             throw DecodingError.dataCorruptedError(forKey: key, in: self, debugDescription: "Found a reference where a value for a nested keyed container was expected.")
         }
         guard case .keyed(let container) = value else {
-            throw DecodingError._typeMismatch(at: decoder.codingPath, expectation: DecodingContainer.Keyed.self, reality: value)
+            throw DecodingError._containerMismatch(at: codingPath, expectation: .keyed, reality: value)
         }
         return KeyedDecodingContainer(KeyedContainerWrapper<NestedKey>(decoder: decoder, container: container))
     }
@@ -346,7 +381,7 @@ fileprivate struct KeyedContainerWrapper<Key>: KeyedDecodingContainerProtocol wh
             throw DecodingError.dataCorruptedError(forKey: key, in: self, debugDescription: "Found a reference where a value for a nested unkeyed container was expected.")
         }
         guard case .unkeyed(let container) = value else {
-            throw DecodingError._typeMismatch(at: decoder.codingPath, expectation: DecodingContainer.Keyed.self, reality: value)
+            throw DecodingError._containerMismatch(at: codingPath, expectation: .unkeyed, reality: value)
         }
         return UnkeyedContainerWrapper(decoder: decoder, container: container)
     }
@@ -359,8 +394,7 @@ fileprivate struct KeyedContainerWrapper<Key>: KeyedDecodingContainerProtocol wh
             throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: codingPath, debugDescription: "Cannot get super decoder -- no value found for key \(key)."))
         }
         guard case .value(let value) = valOrRef else {
-            // FIXME: couldn't use dataCorruptedError(forKey:in:debugDescription:) because the key isn't Key.
-            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: codingPath, debugDescription: "Found a reference where a value for a super decoder was expected."))
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: codingPath, debugDescription: "\(self): Found a reference for key \(key) where a value for a super decoder was expected."))
         }
         return SuperDecoder(decoder: decoder, container: DecodingContainer(value))
     }
@@ -449,7 +483,7 @@ fileprivate struct UnkeyedContainerWrapper: UnkeyedDecodingContainer {
             throw DecodingError.dataCorruptedError(in: self, debugDescription: "Found a reference where a value for a nested keyed container was expected.")
         }
         guard case .keyed(let container) = value else {
-            throw DecodingError._typeMismatch(at: decoder.codingPath, expectation: DecodingContainer.Keyed.self, reality: value)
+            throw DecodingError._containerMismatch(at: codingPath, expectation: .keyed, reality: value)
         }
         currentIndex += 1
         return KeyedDecodingContainer(KeyedContainerWrapper<NestedKey>(decoder: decoder, container: container))
@@ -467,7 +501,7 @@ fileprivate struct UnkeyedContainerWrapper: UnkeyedDecodingContainer {
             throw DecodingError.dataCorruptedError(in: self, debugDescription: "Found a reference where a value for a nested unkeyed container was expected.")
         }
         guard case .unkeyed(let container) = value else {
-            throw DecodingError._typeMismatch(at: decoder.codingPath, expectation: DecodingContainer.Unkeyed.self, reality: value)
+            throw DecodingError._containerMismatch(at: codingPath, expectation: .unkeyed, reality: value)
         }
         currentIndex += 1
         return UnkeyedContainerWrapper(decoder: decoder, container: container)
@@ -494,7 +528,7 @@ extension _Decoder: SingleValueDecodingContainer {
     
     fileprivate func topContainerSingleValue() throws -> DecodingContainer.Single {
         guard case .single(let container)? = containers.last else {
-            throw DecodingError._typeMismatch(at: codingPath, expectation: DecodingContainer.Single.self, reality: containers.last as Any)
+            throw DecodingError._containerMismatch(at: codingPath, expectation: .single, reality: containers.last)
         }
         return container
     }
@@ -545,21 +579,21 @@ fileprivate final class SuperDecoder: Decoder {
     
     func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key : CodingKey {
         guard case .keyed(let container) = container else {
-            throw DecodingError._typeMismatch(at: codingPath, expectation: DecodingContainer.Keyed.self, reality: self.container)
+            throw DecodingError._containerMismatch(at: codingPath, expectation: .keyed, reality: self.container)
         }
         return KeyedDecodingContainer(KeyedContainerWrapper(decoder: decoder, container: container))
     }
     
     func unkeyedContainer() throws -> UnkeyedDecodingContainer {
         guard case .unkeyed(let container) = container else {
-            throw DecodingError._typeMismatch(at: codingPath, expectation: DecodingContainer.Unkeyed.self, reality: self.container)
+            throw DecodingError._containerMismatch(at: codingPath, expectation: .unkeyed, reality: self.container)
         }
         return UnkeyedContainerWrapper(decoder: decoder, container: container)
     }
     
     func singleValueContainer() throws -> SingleValueDecodingContainer {
         guard case .single = container else {
-            throw DecodingError._typeMismatch(at: codingPath, expectation: DecodingContainer.Single.self, reality: container)
+            throw DecodingError._containerMismatch(at: codingPath, expectation: .single, reality: self.container)
         }
         return self
     }
@@ -570,7 +604,7 @@ extension SuperDecoder: SingleValueDecodingContainer {
     
     fileprivate func singleValue() throws -> DecodingContainer.Single {
         guard case .single(let container) = container else {
-            throw DecodingError._typeMismatch(at: codingPath, expectation: DecodingContainer.Single.self, reality: self.container)
+            throw DecodingError._containerMismatch(at: codingPath, expectation: .single, reality: self.container)
         }
         return container
     }
