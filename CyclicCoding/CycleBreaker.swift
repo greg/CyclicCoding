@@ -22,7 +22,8 @@ protocol CycleBreakerDecoder: SingleValueDecodingContainer {
 
 /// Stores a **weak** reference to an `Object` instance.
 /// Use this class to break cycles in a data model to be encoded with `CyclicEncoder`.
-public struct WeakCycleBreaker<Object: AnyObject & Codable>: Codable {
+/// - Note: `Encodable` and `Decodable` conformance is implemented in extensions to allow storing objects which are only one of those. Storing an object which conforms to neither is therefore possible but not useful.
+public struct WeakCycleBreaker<Object: AnyObject> {
     
     /// An implementation detail to allow delayed filling during decoding
     private final class Fillable {
@@ -38,6 +39,39 @@ public struct WeakCycleBreaker<Object: AnyObject & Codable>: Codable {
     public init(object: Object? = nil) {
         self.storage.object = object
     }
+    
+    /// Use the subscript to access the object weakly referenced by the cycle breaker.
+    public subscript() -> Object? {
+        get {
+            return storage.object
+        }
+        set {
+            storage.object = newValue
+        }
+    }
+    
+}
+
+extension WeakCycleBreaker: Encodable where Object: Encodable {
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        if let object = storage.object {
+            if let encoder = container as? CycleBreakerEncoder {
+                try encoder.encodeBreakingCycle(object)
+            }
+            else {
+                try container.encode(object)
+            }
+        }
+        else {
+            try container.encodeNil()
+        }
+    }
+    
+}
+
+extension WeakCycleBreaker: Decodable where Object: Decodable {
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -55,49 +89,17 @@ public struct WeakCycleBreaker<Object: AnyObject & Codable>: Codable {
         }
     }
     
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        if let object = storage.object {
-            if let encoder = container as? CycleBreakerEncoder {
-                try encoder.encodeBreakingCycle(object)
-            }
-            else {
-                try container.encode(object)
-            }
-        }
-        else {
-            try container.encodeNil()
-        }
-    }
-    
-    /// Use the subscript to access the object weakly referenced by the cycle breaker.
-    public subscript() -> Object? {
-        get {
-            return storage.object
-        }
-        set {
-            storage.object = newValue
-        }
-    }
-    
 }
 
 /// Stores an **unowned** reference to an `Object` instance.
 /// Use this class to break cycles in a data model to be encoded with `CyclicEncoder`.
-public struct UnownedCycleBreaker<Object: AnyObject & Codable>: Codable {
+/// - Note: `Encodable` and `Decodable` conformance is implemented in extensions to allow storing objects which are only one of those. Storing an object which conforms to neither is therefore possible but not useful.
+public struct UnownedCycleBreaker<Object: AnyObject> {
     
     private var breaker: WeakCycleBreaker<Object>
     
     public init(object: Object) {
         self.breaker = WeakCycleBreaker(object: object)
-    }
-    
-    public init(from decoder: Decoder) throws {
-        self.breaker = try WeakCycleBreaker(from: decoder)
-    }
-    
-    public func encode(to encoder: Encoder) throws {
-        try breaker.encode(to: encoder)
     }
     
     /// Use the subscript to access the unowned object referenced by the cycle breaker.
@@ -108,6 +110,22 @@ public struct UnownedCycleBreaker<Object: AnyObject & Codable>: Codable {
         set {
             breaker[] = newValue
         }
+    }
+    
+}
+
+extension UnownedCycleBreaker: Encodable where Object: Encodable {
+    
+    public func encode(to encoder: Encoder) throws {
+        try breaker.encode(to: encoder)
+    }
+    
+}
+
+extension UnownedCycleBreaker: Decodable where Object: Decodable {
+    
+    public init(from decoder: Decoder) throws {
+        self.breaker = try WeakCycleBreaker(from: decoder)
     }
     
 }
