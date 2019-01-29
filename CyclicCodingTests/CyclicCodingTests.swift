@@ -486,5 +486,43 @@ class CyclicCodingTests: XCTestCase {
         
         XCTAssert(decoded.x == 5 && decoded.y == 4)
     }
+    
+    func testUsageExample() {
+        
+        class TreeNode: Codable {
+            var parent = WeakCycleBreaker<TreeNode>()
+            var children: [TreeNode] = []
+            
+            init(parent: TreeNode?) {
+                self.parent[] = parent
+                parent?.children.append(self)
+            }
+        }
+        
+        let root = TreeNode(parent: nil)
+        let a = TreeNode(parent: root)
+        let _ = TreeNode(parent: root)
+        let _ = TreeNode(parent: a)
+        root.children.append(a)
+        
+        let flattened = try! CyclicEncoder().flatten(root)
+        let json = try! JSONEncoder().encode(flattened)
+        
+        let decoded = try! JSONDecoder().decode(FlattenedContainer.self, from: json)
+        let unflattened = try! CyclicDecoder().decode(TreeNode.self, from: decoded)
+        
+        XCTAssert(flattened == decoded)
+        
+        XCTAssert(unflattened.parent[] == nil)
+        XCTAssert(unflattened.children.count == 3)
+        XCTAssert(unflattened.children[0].parent[] === unflattened)
+        XCTAssert(unflattened.children[0] !== unflattened.children[1])
+        XCTAssert(unflattened.children[0] === unflattened.children[2])
+        XCTAssert(unflattened.children[1].children.isEmpty)
+        XCTAssert(unflattened.children[0].children.count == 1)
+        XCTAssert(unflattened.children[0].children[0].children.isEmpty)
+        
+        print(flattened)
+    }
 
 }
