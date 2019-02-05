@@ -217,6 +217,7 @@ extension _Decoder {
             case .undecoded(let value):
                 referenced[index.value] = .decoding(completion: [convertingCompletion])
                 let object = try actuallyUnbox(value, as: type)
+                // If this fails, either the data was corrupted (or manually produced), or perhaps the data model replaced a class with a struct?
                 precondition(type is AnyClass, "Type \(type) for a referenced object must be a class.")
                 guard case .decoding(let completions) = referenced[index.value] else {
                     preconditionFailure("BUG: object was decoded twice.")

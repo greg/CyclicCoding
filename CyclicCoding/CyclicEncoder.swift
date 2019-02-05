@@ -138,7 +138,7 @@ extension _Encoder {
             throw error
         }
         
-        precondition(containers.count == depth + 1, "Encoding a value should push exactly one additional storage.")
+        precondition(containers.count == depth + 1, "BUG: Encoding a value should push exactly one additional storage.")
         
         return containers.removeLast().finalise()
     }
@@ -471,7 +471,7 @@ fileprivate struct UnkeyedContainerWrapper: UnkeyedEncodingContainer {
 extension _Encoder: SingleValueEncodingContainer {
     
     private func assertCanEncodeNewValue() {
-        precondition(canEncodeNewValue, "Attempt to encode value through single value container when value has already been encoded.")
+        precondition(canEncodeNewValue, "USER ERROR: Attempt to encode value through single value container when value has already been encoded.")
     }
     
     func encodeNil()               { assertCanEncodeNewValue(); containers.append(.single(.init(boxNil()))) }
