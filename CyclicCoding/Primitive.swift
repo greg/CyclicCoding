@@ -241,7 +241,7 @@ extension FlattenedContainer.ValueOrReference: CustomStringConvertible {
 extension FlattenedContainer: CustomStringConvertible {
     
     public var description: String {
-        return "[" + (referenced.map({ $0.description }) + [root.description]).joined(separator: ", ") + "]"
+        return "referenced: \(referenced), root: \(root)"
     }
     
 }

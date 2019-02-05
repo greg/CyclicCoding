@@ -35,7 +35,7 @@ class CyclicCodingTests: XCTestCase {
         
         let encoded = try! CyclicEncoder().flatten(b)
         
-        XCTAssert(encoded.description == "[{ a: { x: 1, y: 2 }, s: \"hi\" }]", "Encoded incorrectly: \(encoded).")
+        XCTAssert(encoded.description == "referenced: [], root: { a: { x: 1, y: 2 }, s: \"hi\" }", "Encoded incorrectly: \(encoded).")
         
         let decoded = try! CyclicDecoder().decode(B.self, from: encoded)
         XCTAssert(decoded == b)
@@ -59,7 +59,7 @@ class CyclicCodingTests: XCTestCase {
         
         let encoded = try! CyclicEncoder().flatten(a)
         
-        XCTAssert(encoded.description == "[{ x: 5 }, { c: #0, d: #0 }]", "Encoded incorrectly: \(encoded).")
+        XCTAssert(encoded.description == "referenced: [{ x: 5 }], root: { c: #0, d: #0 }", "Encoded incorrectly: \(encoded).")
         
         let decoded = try! CyclicDecoder().decode(A.self, from: encoded)
         XCTAssert(decoded.c.x == a.c.x && decoded.d.x == a.d.x)
@@ -88,7 +88,7 @@ class CyclicCodingTests: XCTestCase {
         let b = B(a: a, c: c)
         
         let encoded = try! CyclicEncoder().flatten(b)
-        XCTAssert(encoded.description == "[{ x: 5 }, { a: { c: #0 }, c: #0 }]", "Encoded incorrectly: \(encoded).")
+        XCTAssert(encoded.description == "referenced: [{ x: 5 }], root: { a: { c: #0 }, c: #0 }", "Encoded incorrectly: \(encoded).")
         
         let decoded = try! CyclicDecoder().decode(B.self, from: encoded)
         XCTAssert(decoded.a.c === decoded.c, "Object should not be duplicated.")
@@ -118,7 +118,7 @@ class CyclicCodingTests: XCTestCase {
         
         let encoded = try! CyclicEncoder().flatten(s)
         
-        XCTAssert(encoded.description == "[5]", "Encoded incorrectly: \(encoded).")
+        XCTAssert(encoded.description == "referenced: [], root: 5", "Encoded incorrectly: \(encoded).")
         
         let decoded = try! CyclicDecoder().decode(S.self, from: encoded)
         XCTAssert(decoded == s)
@@ -154,7 +154,7 @@ class CyclicCodingTests: XCTestCase {
         
         let encoded = try! CyclicEncoder().flatten(d)
         
-        XCTAssert(encoded.description == "[5, { c: #0, d: #0 }]", "Encoded incorrectly: \(encoded).")
+        XCTAssert(encoded.description == "referenced: [5], root: { c: #0, d: #0 }", "Encoded incorrectly: \(encoded).")
         
         let decoded = try! CyclicDecoder().decode(D.self, from: encoded)
         XCTAssert(decoded.c.x == d.c.x && decoded.d.x == d.d.x)
@@ -170,7 +170,7 @@ class CyclicCodingTests: XCTestCase {
         let a = [S(x: 1), S(x: 3), S(x: 2)]
         
         let encoded = try! CyclicEncoder().flatten(a)
-        XCTAssert(encoded.description == "[[{ x: 1 }, { x: 3 }, { x: 2 }]]", "Encoded incorrectly: \(encoded).")
+        XCTAssert(encoded.description == "referenced: [], root: [{ x: 1 }, { x: 3 }, { x: 2 }]", "Encoded incorrectly: \(encoded).")
         
         let decoded = try! CyclicDecoder().decode([S].self, from: encoded)
         XCTAssert(decoded.elementsEqual(a, by: { $0.x == $1.x }))
@@ -249,13 +249,13 @@ class CyclicCodingTests: XCTestCase {
         
         let k = K(x: (5, "hi", true), y: (6, .pi))
         let encodedk = try! CyclicEncoder().flatten(k)
-        XCTAssert(encodedk.description == "[{ x: [5, \"hi\", true], y: { x: 3.1415925, y: 6 } }]", "Encoded incorrectly: \(encodedk).")
+        XCTAssert(encodedk.description == "referenced: [], root: { x: [5, \"hi\", true], y: { x: 3.1415925, y: 6 } }", "Encoded incorrectly: \(encodedk).")
         let decodedk = try! CyclicDecoder().decode(K.self, from: encodedk)
         XCTAssert(decodedk.x == k.x && decodedk.y == k.y)
         
         let u = U(x: (5, "hi", true), y: (6, .pi))
         let encodedu = try! CyclicEncoder().flatten(u)
-        XCTAssert(encodedu.description == "[[[5, \"hi\", true], { x: 3.1415925, y: 6 }]]", "Encoded incorrectly: \(encodedu).")
+        XCTAssert(encodedu.description == "referenced: [], root: [[5, \"hi\", true], { x: 3.1415925, y: 6 }]", "Encoded incorrectly: \(encodedu).")
         let decodedu = try! CyclicDecoder().decode(U.self, from: encodedu)
         XCTAssert(decodedu.x == u.x && decodedu.y == u.y)
     }
@@ -300,7 +300,7 @@ class CyclicCodingTests: XCTestCase {
         XCTAssert(p.a.c === p.b.c)
         
         let encoded = try! CyclicEncoder().flatten(p)
-        XCTAssert(encoded.description == "[{ x: 5 }, { a: #0, b: #0 }]", "Encoded incorrectly: \(encoded).")
+        XCTAssert(encoded.description == "referenced: [{ x: 5 }], root: { a: #0, b: #0 }", "Encoded incorrectly: \(encoded).")
         let decoded = try! CyclicDecoder().decode(P.self, from: encoded)
         XCTAssert(decoded.a.c.x == 5 && decoded.b.c.x == 5)
         XCTAssert(decoded.a.c === decoded.b.c, "object was duplicated during decoding")
@@ -373,7 +373,7 @@ class CyclicCodingTests: XCTestCase {
         d.c[] = c
 
         let encoded = try! CyclicEncoder().flatten(c)
-        XCTAssert(encoded.description == "[{ d: { c: #0, y: 5 }, x: 4 }, #0]", "Encoded incorrectly: \(encoded).")
+        XCTAssert(encoded.description == "referenced: [{ d: { c: #0, y: 5 }, x: 4 }], root: #0", "Encoded incorrectly: \(encoded).")
 
         let decoded = try! CyclicDecoder().decode(C.self, from: encoded)
         XCTAssert(decoded.x == c.x && decoded.d.y == c.d.y)
@@ -487,40 +487,79 @@ class CyclicCodingTests: XCTestCase {
         XCTAssert(decoded.x == 5 && decoded.y == 4)
     }
     
-    func testUsageExample() {
+    func testDuplicatesUsageExample() {
         
-        class TreeNode: Codable {
-            var parent = WeakCycleBreaker<TreeNode>()
-            var children: [TreeNode] = []
-            
-            init(parent: TreeNode?) {
-                self.parent[] = parent
-                parent?.children.append(self)
+        class Helper: Codable {
+            // ...
+        }
+        
+        struct Thing: Codable {
+            var helper: Helper
+            // ...
+        }
+        
+        let helga = Helper()
+        let helen = Helper()
+        
+        let things = [Thing(helper: helga), Thing(helper: helen), Thing(helper: helga)]
+        
+        // Use CyclicCoding's encoder to handle the duplicates for us
+        let flattened = try! CyclicEncoder().flatten(things)
+        // Encode the intermediate representation it produced to data we can write to a file
+        let data = try! JSONEncoder().encode(flattened)
+        
+        // Decode the intermediate representation from the data
+        let decoded = try! JSONDecoder().decode(FlattenedContainer.self, from: data)
+        // Use CyclicCoding's decoder to reconstruct our objects correctly
+        let unflattened = try! CyclicDecoder().decode([Thing].self, from: decoded)
+        
+        XCTAssert(unflattened.count == 3) // there are 3 things in the array
+        XCTAssert(unflattened[0].helper === unflattened[2].helper) // helga is the helper for both of these
+        XCTAssert(unflattened[0].helper !== unflattened[1].helper) // helga is not helen
+        
+        print(flattened)
+    }
+    
+    func testCyclesUsageExample() {
+        
+        struct Action: Codable {
+            // use CyclicCoding's cycle breaker to ensure the cycle can be decoded correctly
+            // weak var queue: ActionQueue?
+            var queue = WeakCycleBreaker<ActionQueue>()
+            // ...
+        }
+        
+        class ActionQueue: Codable {
+            var actions: [Action] = []
+            // ...
+            func add(action: Action) {
+                var action = action
+                // an empty subscript [] is used to access the object inside the cycle breaker,
+                // much like ! after an optional
+                action.queue[] = self
+                actions.append(action)
             }
         }
         
-        let root = TreeNode(parent: nil)
-        let a = TreeNode(parent: root)
-        let _ = TreeNode(parent: root)
-        let _ = TreeNode(parent: a)
-        root.children.append(a)
+        let queue = ActionQueue()
+        let wasteTime = Action()
+        let somethingUseful = Action()
+        queue.add(action: wasteTime)
+        queue.add(action: somethingUseful)
         
-        let flattened = try! CyclicEncoder().flatten(root)
-        let json = try! JSONEncoder().encode(flattened)
+        // Use CyclicCoding's encoder to handle the cycles for us
+        let flattened = try! CyclicEncoder().flatten(queue)
+        // Encode the intermediate represntation it produced to data we can write to a file
+        let data = try! JSONEncoder().encode(flattened)
         
-        let decoded = try! JSONDecoder().decode(FlattenedContainer.self, from: json)
-        let unflattened = try! CyclicDecoder().decode(TreeNode.self, from: decoded)
+        // Decode the intermediate representation from the data
+        let decoded = try! JSONDecoder().decode(FlattenedContainer.self, from: data)
+        // Use CyclicCoding's decoder to reconstruct the cycles correctly
+        let unflattened = try! CyclicDecoder().decode(ActionQueue.self, from: decoded)
         
-        XCTAssert(flattened == decoded)
-        
-        XCTAssert(unflattened.parent[] == nil)
-        XCTAssert(unflattened.children.count == 3)
-        XCTAssert(unflattened.children[0].parent[] === unflattened)
-        XCTAssert(unflattened.children[0] !== unflattened.children[1])
-        XCTAssert(unflattened.children[0] === unflattened.children[2])
-        XCTAssert(unflattened.children[1].children.isEmpty)
-        XCTAssert(unflattened.children[0].children.count == 1)
-        XCTAssert(unflattened.children[0].children[0].children.isEmpty)
+        XCTAssert(unflattened.actions.count == 2) // there are 2 actions in the queue
+        XCTAssert(unflattened.actions[0].queue[] === unflattened) // each action correctly references the queue, not a copy
+        XCTAssert(unflattened.actions[1].queue[] === unflattened)
         
         print(flattened)
     }
