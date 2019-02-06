@@ -8,3 +8,6 @@ matrix:
   - script:
     - set -o pipefail && xcodebuild -project CyclicCoding.xcodeproj -scheme CyclicCoding\ iOS -destination platform\=iOS\ Simulator,OS\=12.1,name\=iPhone\ X build test | xcpretty
 
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
