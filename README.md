@@ -1,8 +1,8 @@
 # CyclicCoding
 
 [![Build Status](https://travis-ci.com/greg/CyclicCoding.svg?token=j2mxyGDSpdggCDnpjKs3&branch=master)](https://travis-ci.com/greg/CyclicCoding)
-[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![codecov](https://codecov.io/gh/greg/CyclicCoding/branch/master/graph/badge.svg)](https://codecov.io/gh/greg/CyclicCoding)
+[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 [`Codable`](https://developer.apple.com/documentation/swift/codable) lets you encode object trees to files with almost no boilerplate. But what if the object graph you want to encode has cycles or duplicates?
 
@@ -175,4 +175,10 @@ root: #0
 There is one referenced element, the action queue. It is also the root element, and so the root element is encoded as a reference `#0`.
 
 Each of the actions also references `#0` as its queue. Thus the cycle is correctly encoded and can be reconstructed.
+
+# Contributing
+
+Contributions are welcome! Just fork the repo and open a pull request to the master branch when you're done. Please try to write a comprehensive description of what you're contributing.
+
+The [issues](./issues) page is a good place to start, and the [discuss tag](./labels/discuss) has issues which are open for discussion — a good place to contribute without writing any code :)
 
