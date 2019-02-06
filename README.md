@@ -180,5 +180,5 @@ Each of the actions also references `#0` as its queue. Thus the cycle is correct
 
 Contributions are welcome! Just fork the repo and open a pull request to the master branch when you're done. Please try to write a comprehensive description of what you're contributing.
 
-The [issues](./issues) page is a good place to start, and the [discuss tag](./labels/discuss) has issues which are open for discussion — a good place to contribute without writing any code :)
+The [issues](https://github.com/greg/CyclicCoding/issues) page is a good place to start, and the [discuss tag](https://github.com/greg/CyclicCoding/labels/discuss) has issues which are open for discussion — a good place to contribute without writing any code :)
 
