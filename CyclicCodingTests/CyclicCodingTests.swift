@@ -601,8 +601,6 @@ class CyclicCodingTests: XCTestCase {
         XCTAssert(unflattened.count == 3) // there are 3 things in the array
         XCTAssert(unflattened[0].helper === unflattened[2].helper) // helga is the helper for both of these
         XCTAssert(unflattened[0].helper !== unflattened[1].helper) // helga is not helen
-        
-        print(flattened)
     }
     
     func testCyclesUsageExample() {
@@ -645,8 +643,6 @@ class CyclicCodingTests: XCTestCase {
         XCTAssert(unflattened.actions.count == 2) // there are 2 actions in the queue
         XCTAssert(unflattened.actions[0].queue[] === unflattened) // each action correctly references the queue, not a copy
         XCTAssert(unflattened.actions[1].queue[] === unflattened)
-        
-        print(flattened)
     }
 
 }
