@@ -16,9 +16,12 @@ import Foundation
 public class CyclicDecoder {
     
     public func decode<T: Decodable>(_ type: T.Type, from flattened: FlattenedContainer) throws -> T {
-        let decoder = _Decoder(referenced: flattened.referenced)
+        let decoder = _Decoder(referenced: flattened.referenced, userInfo: userInfo)
         return try decoder.unbox(flattened.root, as: type)
     }
+    
+    /// A user-provided dictionary which objects can access (read-only) via `decoder.userInfo` during encoding with `init(from:)`.
+    public var userInfo: [CodingUserInfoKey : Any] = [:]
     
 }
 
@@ -37,14 +40,13 @@ fileprivate class _Decoder: Decoder {
     /// A function to provide a resolved value to the most recently encountered cycle breaker. Set when one is encountered, and unset when an appropriate object is found to fill it with.
     private var cycleBreakerFiller: ((AnyObject) -> Void)?
     
-    var userInfo: [CodingUserInfoKey : Any] {
-        
-        return [:]
-    }
+    let userInfo: [CodingUserInfoKey : Any]
     
-    init(referenced: [Value]) {
+    init(referenced: [Value], userInfo: [CodingUserInfoKey : Any]) {
         codingPath = []
         containers = []
+    
+        self.userInfo = userInfo
         
         self.referenced = referenced.map { .undecoded($0) }
     }

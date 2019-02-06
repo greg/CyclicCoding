@@ -18,9 +18,12 @@ import Foundation
 public class CyclicEncoder {
     
     public func flatten<T: Encodable>(_ value: T) throws -> FlattenedContainer {
-        let encoder = _Encoder()
+        let encoder = _Encoder(userInfo: userInfo)
         return try encoder.encodeRoot(value)
     }
+    
+    /// A user-provided dictionary which objects can access (read-only) via `encoder.userInfo` during encoding with `encode(to:)`.
+    public var userInfo: [CodingUserInfoKey : Any] = [:]
     
 }
 
@@ -41,13 +44,13 @@ fileprivate final class _Encoder: Encoder {
     /// For each object protected by a cycle breaker, the number of cycle breakers encountered.
     private var cycleBreakers: [ObjectIdentifier : Int]
     
-    var userInfo: [CodingUserInfoKey : Any] {
-        return [:]
-    }
+    let userInfo: [CodingUserInfoKey : Any]
     
-    init() {
+    init(userInfo: [CodingUserInfoKey : Any]) {
         codingPath = []
         containers = []
+    
+        self.userInfo = userInfo
         
         objectUsage = [:]
         referenced = []
