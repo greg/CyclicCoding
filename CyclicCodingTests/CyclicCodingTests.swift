@@ -487,6 +487,91 @@ class CyclicCodingTests: XCTestCase {
         XCTAssert(decoded.x == 5 && decoded.y == 4)
     }
     
+    func testCodingPathReporting() {
+        
+        class A: Codable {
+            
+            class B: Codable {
+                func encode(to encoder: Encoder) throws {
+                    XCTAssertEqual(encoder.codingPath.map({ $0.stringValue }).joined(separator: "/"), "b")
+                    let container = encoder.unkeyedContainer()
+                    XCTAssertEqual(container.codingPath.map({ $0.stringValue }).joined(separator: "/"), "b")
+                }
+                
+                required init(from decoder: Decoder) throws {
+                    XCTAssertEqual(decoder.codingPath.map({ $0.stringValue }).joined(separator: "/"), "b")
+                    let container = try decoder.unkeyedContainer()
+                    XCTAssertEqual(container.codingPath.map({ $0.stringValue }).joined(separator: "/"), "b")
+                }
+                
+                init() {}
+            }
+            
+            class C: Codable {
+                
+                class D: Codable {
+                    
+                    class E: Codable {
+                        func encode(to encoder: Encoder) throws {
+                            XCTAssertEqual(encoder.codingPath.map({ $0.stringValue }).joined(separator: "/"), "c/d/e")
+                            var container = encoder.singleValueContainer()
+                            XCTAssertEqual(container.codingPath.map({ $0.stringValue }).joined(separator: "/"), "c/d/e")
+                            try container.encode(false)
+                        }
+                        
+                        required init(from decoder: Decoder) throws {
+                            XCTAssertEqual(decoder.codingPath.map({ $0.stringValue }).joined(separator: "/"), "c/d/e")
+                            let container = try decoder.singleValueContainer()
+                            XCTAssertEqual(container.codingPath.map({ $0.stringValue }).joined(separator: "/"), "c/d/e")
+                            _ = try container.decode(Bool.self)
+                        }
+                        
+                        init() {}
+                    }
+                    
+                    enum Key: CodingKey {
+                        case e
+                    }
+                    
+                    func encode(to encoder: Encoder) throws {
+                        XCTAssertEqual(encoder.codingPath.map({ $0.stringValue }).joined(separator: "/"), "c/d")
+                        var container = encoder.container(keyedBy: Key.self)
+                        XCTAssertEqual(container.codingPath.map({ $0.stringValue }).joined(separator: "/"), "c/d")
+                        try container.encode(E(), forKey: .e)
+                    }
+                    
+                    required init(from decoder: Decoder) throws {
+                        XCTAssertEqual(decoder.codingPath.map({ $0.stringValue }).joined(separator: "/"), "c/d")
+                        let container = try decoder.container(keyedBy: Key.self)
+                        XCTAssertEqual(container.codingPath.map({ $0.stringValue }).joined(separator: "/"), "c/d")
+                        _ = try container.decode(E.self, forKey: .e)
+                    }
+                    
+                    init() {}
+                }
+                
+                let d: D
+                
+                init() {
+                    d = D()
+                }
+            }
+            
+            let b: B
+            let c: C
+            
+            init() {
+                b = B()
+                c = C()
+            }
+        }
+        
+        let a = A()
+        
+        let flattened = try! CyclicEncoder().flatten(a)
+        _ = try! CyclicDecoder().decode(A.self, from: flattened)
+    }
+    
     func testDuplicatesUsageExample() {
         
         class Helper: Codable {
