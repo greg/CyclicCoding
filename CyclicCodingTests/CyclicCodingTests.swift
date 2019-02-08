@@ -94,6 +94,38 @@ class CyclicCodingTests: XCTestCase {
         XCTAssert(decoded.a.c === decoded.c, "Object should not be duplicated.")
     }
     
+    func testArrayDuplicateCoding() {
+        
+        class Helper: Codable {
+            var helpfulness: Int
+            init(helpfulness: Int) { self.helpfulness = helpfulness }
+        }
+        
+        struct Needful: Codable {
+            var helper: Helper
+        }
+        
+        let helen = Helper(helpfulness: 3)
+        let helga = Helper(helpfulness: 1)
+        
+        let nelly = Needful(helper: helen)
+        let nessy = Needful(helper: helga)
+        let nolan = Needful(helper: helen)
+        
+        let root = [nelly, nessy, nolan]
+        
+        XCTAssert(root[0].helper === root[2].helper, "The test is set up incorrectly")
+        
+        let flattened = try! CyclicEncoder().flatten(root)
+        let decoded = try! CyclicDecoder().decode([Needful].self, from: flattened)
+        
+        XCTAssert(decoded.count == 3)
+        XCTAssert(decoded[0].helper.helpfulness == 3)
+        XCTAssert(decoded[1].helper.helpfulness == 1)
+        XCTAssert(decoded[0].helper !== decoded[1].helper)
+        XCTAssert(decoded[0].helper === decoded[2].helper)
+    }
+    
     func testSingleValueCoding() {
         
         struct S: Codable, Equatable {
