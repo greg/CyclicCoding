@@ -15,6 +15,8 @@ import Foundation
 ///     - `CyclicEncoder` will not encode any cycles which cannot successfully be decoded. The only way an undecodable cycle could be present in the flattened representation is if it were manually created.
 public class CyclicDecoder {
     
+    public init() {}
+    
     public func decode<T: Decodable>(_ type: T.Type, from flattened: FlattenedContainer) throws -> T {
         let decoder = _Decoder(referenced: flattened.referenced, userInfo: userInfo)
         return try decoder.unbox(flattened.root, as: type)

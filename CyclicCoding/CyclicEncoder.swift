@@ -17,6 +17,8 @@ import Foundation
 ///     - If you attempt to encode an object graph containing a cycle without a cycle breaker, an error will be thrown.
 public class CyclicEncoder {
     
+    public init() {}
+    
     public func flatten<T: Encodable>(_ value: T) throws -> FlattenedContainer {
         let encoder = _Encoder(userInfo: userInfo)
         return try encoder.encodeRoot(value)
