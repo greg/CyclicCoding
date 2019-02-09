@@ -13,12 +13,17 @@ protocol CycleBreakerEncoder: SingleValueEncodingContainer {
     
 }
 
+/// We store the encoder in a user info key in case another library wraps the encoder and hides the type info so we can't cast.
+let cycleBreakerEncoderUserInfoKey = CodingUserInfoKey(rawValue: "CyclicCoding.cycleBreakerEncoder")!
+
 /// An internal protocol used to identify _Decoder instances and use a private decoding method.
 protocol CycleBreakerDecoder: SingleValueDecodingContainer {
     
     func decode<T: Decodable>(_ type: T.Type, completion: @escaping (T) -> Void) throws
     
 }
+
+let cycleBreakerDecoderUserInfoKey = CodingUserInfoKey(rawValue: "CyclicCoding.cycleBreakerDecoder")!
 
 /// Stores a **weak** reference to an `Object` instance.
 /// Use this class to break cycles in a data model to be encoded with `CyclicEncoder`.
@@ -57,7 +62,7 @@ extension WeakCycleBreaker: Encodable where Object: Encodable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         if let object = storage.object {
-            if let encoder = container as? CycleBreakerEncoder {
+            if let encoder = encoder.userInfo[cycleBreakerEncoderUserInfoKey] as? CycleBreakerEncoder {
                 try encoder.encodeBreakingCycle(object)
             }
             else {
@@ -76,7 +81,7 @@ extension WeakCycleBreaker: Decodable where Object: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if !container.decodeNil() {
-            if let decoder = container as? CycleBreakerDecoder {
+            if let decoder = decoder.userInfo[cycleBreakerDecoderUserInfoKey] as? CycleBreakerDecoder {
                 let storage = self.storage
                 try decoder.decode(Object.self, completion: {
                     storage.object = $0

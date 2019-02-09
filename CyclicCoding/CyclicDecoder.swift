@@ -42,7 +42,7 @@ fileprivate class _Decoder: Decoder {
     /// A function to provide a resolved value to the most recently encountered cycle breaker. Set when one is encountered, and unset when an appropriate object is found to fill it with.
     private var cycleBreakerFiller: ((AnyObject) -> Void)?
     
-    let userInfo: [CodingUserInfoKey : Any]
+    private(set) var userInfo: [CodingUserInfoKey : Any]
     
     init(referenced: [Value], userInfo: [CodingUserInfoKey : Any]) {
         codingPath = []
@@ -51,6 +51,9 @@ fileprivate class _Decoder: Decoder {
         self.userInfo = userInfo
         
         self.referenced = referenced.map { .undecoded($0) }
+        
+        // overwrites that key in the dictionary, but people shouldn't really use a key with that name anyway
+        self.userInfo[cycleBreakerDecoderUserInfoKey] = self
     }
     
     func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key : CodingKey {
@@ -579,7 +582,10 @@ fileprivate final class SuperDecoder: Decoder {
     }
     
     var userInfo: [CodingUserInfoKey : Any] {
-        return decoder.userInfo
+        // SuperDecoder does _not_ conform to CycleBreakerDecoder, and there is no need for it to
+        var userInfo = decoder.userInfo
+        userInfo[cycleBreakerEncoderUserInfoKey] = nil
+        return userInfo
     }
     
     func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key : CodingKey {

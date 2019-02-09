@@ -46,7 +46,7 @@ fileprivate final class _Encoder: Encoder {
     /// For each object protected by a cycle breaker, the number of cycle breakers encountered.
     private var cycleBreakers: [ObjectIdentifier : Int]
     
-    let userInfo: [CodingUserInfoKey : Any]
+    private(set) var userInfo: [CodingUserInfoKey : Any]
     
     init(userInfo: [CodingUserInfoKey : Any]) {
         codingPath = []
@@ -58,6 +58,9 @@ fileprivate final class _Encoder: Encoder {
         referenced = []
         encodingStack = []
         cycleBreakers = [:]
+        
+        // overwrites that key in the dictionary, but people shouldn't really use a key with that name anyway
+        self.userInfo[cycleBreakerEncoderUserInfoKey] = self
     }
     
     func encodeRoot<T: Encodable>(_ value: T) throws -> FlattenedContainer {
@@ -515,7 +518,10 @@ fileprivate final class SuperEncoder: Encoder {
     }
     
     var userInfo: [CodingUserInfoKey : Any] {
-        return encoder.userInfo
+        // SuperEncoder does _not_ conform to CycleBreakerEncoder, and there is no need for it to
+        var userInfo = encoder.userInfo
+        userInfo[cycleBreakerEncoderUserInfoKey] = nil
+        return userInfo
     }
     
     func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key : CodingKey {
