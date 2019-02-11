@@ -6,43 +6,29 @@
 //  Copyright © 2019 Greg Omelaenko. All rights reserved.
 //
 
-/// An internal protocol used to identify _Encoder instances and notify them of cycle breakers.
-protocol CycleBreakerEncoder: SingleValueEncodingContainer {
+import CodableInterception
+
+protocol EncodableCycleBreaker: Encodable {
     
-    func encodeBreakingCycle<T: Encodable & AnyObject>(_ value: T) throws
+    var objectIdentifier: ObjectIdentifier? { get }
     
 }
 
-/// We store the encoder in a user info key in case another library wraps the encoder and hides the type info so we can't cast.
-let cycleBreakerEncoderUserInfoKey = CodingUserInfoKey(rawValue: "CyclicCoding.cycleBreakerEncoder")!
-
-/// An internal protocol used to identify _Decoder instances and use a private decoding method.
-protocol CycleBreakerDecoder: SingleValueDecodingContainer {
+protocol DecodableCycleBreaker: Decodable {
     
-    func decode<T: Decodable>(_ type: T.Type, completion: @escaping (T) -> Void) throws
+    init(requestFrom maker: WeakFillableMaker) throws
     
 }
-
-let cycleBreakerDecoderUserInfoKey = CodingUserInfoKey(rawValue: "CyclicCoding.cycleBreakerDecoder")!
 
 /// Stores a **weak** reference to an `Object` instance.
 /// Use this class to break cycles in a data model to be encoded with `CyclicEncoder`.
 /// - Note: `Encodable` and `Decodable` conformance is implemented in extensions to allow storing objects which are only one of those. Storing an object which conforms to neither is therefore possible but not useful.
 public struct WeakCycleBreaker<Object: AnyObject> {
     
-    /// An implementation detail to allow delayed filling during decoding
-    private final class Fillable {
-        
-        weak var object: Object?
-        
-        init() {}
-        
-    }
-    
-    private let storage = Fillable()
+    private let storage: WeakFillable<Object>
     
     public init(object: Object? = nil) {
-        self.storage.object = object
+        self.storage = WeakFillable(filledWith: object)
     }
     
     /// Use the subscript to access the object weakly referenced by the cycle breaker.
@@ -50,48 +36,48 @@ public struct WeakCycleBreaker<Object: AnyObject> {
         get {
             return storage.object
         }
-        set {
+        mutating set {
             storage.object = newValue
         }
     }
     
 }
 
-extension WeakCycleBreaker: Encodable where Object: Encodable {
+extension WeakCycleBreaker: Encodable, EncodableCycleBreaker where Object: Encodable {
     
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         if let object = storage.object {
-            if let encoder = encoder.userInfo[cycleBreakerEncoderUserInfoKey] as? CycleBreakerEncoder {
-                try encoder.encodeBreakingCycle(object)
-            }
-            else {
-                try container.encode(object)
-            }
+            try container.encode(object)
         }
         else {
             try container.encodeNil()
         }
     }
     
+    var objectIdentifier: ObjectIdentifier? {
+        return self[].map({ ObjectIdentifier($0) })
+    }
+    
 }
 
-extension WeakCycleBreaker: Decodable where Object: Decodable {
+extension WeakCycleBreaker: Decodable, DecodableCycleBreaker where Object: Decodable {
     
     public init(from decoder: Decoder) throws {
+        // _Decoder will *never* call this function, it should just decode normally
         let container = try decoder.singleValueContainer()
-        if !container.decodeNil() {
-            if let decoder = decoder.userInfo[cycleBreakerDecoderUserInfoKey] as? CycleBreakerDecoder {
-                let storage = self.storage
-                try decoder.decode(Object.self, completion: {
-                    storage.object = $0
-                })
-            }
-            else {
-                // this decoder isn't our cycle-aware one, decode normally
-                self.storage.object = try container.decode(Object.self)
-            }
+        let object: Object?
+        if container.decodeNil() {
+            object = nil
         }
+        else {
+            object = try container.decode(Object.self)
+        }
+        self.storage = WeakFillable(filledWith: object)
+    }
+    
+    init(requestFrom maker: WeakFillableMaker) throws {
+        self.storage = try maker.request(Object.self)
     }
     
 }
@@ -119,18 +105,26 @@ public struct UnownedCycleBreaker<Object: AnyObject> {
     
 }
 
-extension UnownedCycleBreaker: Encodable where Object: Encodable {
+extension UnownedCycleBreaker: Encodable, EncodableCycleBreaker where Object: Encodable {
     
     public func encode(to encoder: Encoder) throws {
         try breaker.encode(to: encoder)
     }
     
+    var objectIdentifier: ObjectIdentifier? {
+        return breaker.objectIdentifier
+    }
+    
 }
 
-extension UnownedCycleBreaker: Decodable where Object: Decodable {
+extension UnownedCycleBreaker: Decodable, DecodableCycleBreaker where Object: Decodable {
     
     public init(from decoder: Decoder) throws {
         self.breaker = try WeakCycleBreaker(from: decoder)
+    }
+    
+    init(requestFrom maker: WeakFillableMaker) throws {
+        self.breaker = try WeakCycleBreaker(requestFrom: maker)
     }
     
 }

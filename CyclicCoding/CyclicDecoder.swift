@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CodableInterception
 
 /// Decodes an object graph from a flattened representation, correctly reconstructing duplicate objects and cycles which use a cycle breaker.
 ///
@@ -42,7 +43,7 @@ fileprivate class _Decoder: Decoder {
     /// A function to provide a resolved value to the most recently encountered cycle breaker. Set when one is encountered, and unset when an appropriate object is found to fill it with.
     private var cycleBreakerFiller: ((AnyObject) -> Void)?
     
-    private(set) var userInfo: [CodingUserInfoKey : Any]
+    let userInfo: [CodingUserInfoKey : Any]
     
     init(referenced: [Value], userInfo: [CodingUserInfoKey : Any]) {
         codingPath = []
@@ -51,9 +52,6 @@ fileprivate class _Decoder: Decoder {
         self.userInfo = userInfo
         
         self.referenced = referenced.map { .undecoded($0) }
-        
-        // overwrites that key in the dictionary, but people shouldn't really use a key with that name anyway
-        self.userInfo[cycleBreakerDecoderUserInfoKey] = self
     }
     
     func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key : CodingKey {
@@ -201,7 +199,20 @@ extension _Decoder {
     private func actuallyUnbox<T: Decodable>(_ value: Value, as type: T.Type) throws -> T {
         containers.append(DecodingContainer(value))
         defer { containers.removeLast() }
-        return try type.init(from: self)
+        
+        func decodeCycleBreaker(_ type: DecodableCycleBreaker.Type) throws -> DecodableCycleBreaker {
+            let maker = WeakFillableMaker(delayedDecoder: self)
+            return try type.init(requestFrom: maker)
+        }
+        if let type = type as? DecodableCycleBreaker.Type {
+            return try decodeCycleBreaker(type) as! T
+        }
+        else if let wrapperType = T.self as? DecodableWrapperProtocol.Type, let type = wrapperType.underlyingValueType as? DecodableCycleBreaker.Type {
+            return wrapperType.init(decodedValue: try decodeCycleBreaker(type)) as! T
+        }
+        else {
+            return try type.init(from: self)
+        }
     }
     
     /// Attempts to unbox `boxed`.
@@ -254,9 +265,9 @@ extension _Decoder {
     
 }
 
-extension _Decoder: CycleBreakerDecoder {
+extension _Decoder: DelayedDecoder {
     
-    func decode<T: Decodable>(_ type: T.Type, completion: @escaping (T) -> Void) throws {
+    func delayableDecode<T>(_ type: T.Type, completion: @escaping (T) -> Void) throws where T : Decodable {
         let boxed = try topContainerSingleValue()
         try delayableUnbox(boxed, as: type, completion: completion)
     }
@@ -582,10 +593,7 @@ fileprivate final class SuperDecoder: Decoder {
     }
     
     var userInfo: [CodingUserInfoKey : Any] {
-        // SuperDecoder does _not_ conform to CycleBreakerDecoder, and there is no need for it to
-        var userInfo = decoder.userInfo
-        userInfo[cycleBreakerEncoderUserInfoKey] = nil
-        return userInfo
+        return decoder.userInfo
     }
     
     func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key : CodingKey {

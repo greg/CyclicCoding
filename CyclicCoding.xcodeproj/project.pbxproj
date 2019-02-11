@@ -14,6 +14,12 @@
 		372BDBDC2129FDF700E767AD /* Primitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372BDBDB2129FDF700E767AD /* Primitive.swift */; };
 		372BDBE0212A80AA00E767AD /* Box.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372BDBDF212A80AA00E767AD /* Box.swift */; };
 		3792D8B5212BD65200E68277 /* CyclicDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3792D8B4212BD65200E68277 /* CyclicDecoder.swift */; };
+		37A8D0E222117D2C007A74F5 /* CodableInterception.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37A8D0E122117D2C007A74F5 /* CodableInterception.framework */; };
+		37A8D0E322117E54007A74F5 /* CodableInterception.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37A8D0E122117D2C007A74F5 /* CodableInterception.framework */; };
+		37A8D0E52211B0FF007A74F5 /* Fillable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A8D0E42211B0FF007A74F5 /* Fillable.swift */; };
+		37A8D0E62211B164007A74F5 /* Fillable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A8D0E42211B0FF007A74F5 /* Fillable.swift */; };
+		37A8D0E82211BAF3007A74F5 /* CodableInterception.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37A8D0E72211BAF3007A74F5 /* CodableInterception.framework */; };
+		37A8D0E92211BB1A007A74F5 /* CodableInterception.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37A8D0E72211BAF3007A74F5 /* CodableInterception.framework */; };
 		37D852AF220016210026B865 /* CyclicCoding.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37D852A6220016210026B865 /* CyclicCoding.framework */; };
 		37D852BD220016C50026B865 /* CyclicCoding.h in Headers */ = {isa = PBXBuildFile; fileRef = 372BDBC02129F13800E767AD /* CyclicCoding.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		37D852BE220016CE0026B865 /* Box.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372BDBDF212A80AA00E767AD /* Box.swift */; };
@@ -53,6 +59,9 @@
 		372BDBDB2129FDF700E767AD /* Primitive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Primitive.swift; sourceTree = "<group>"; };
 		372BDBDF212A80AA00E767AD /* Box.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Box.swift; sourceTree = "<group>"; };
 		3792D8B4212BD65200E68277 /* CyclicDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CyclicDecoder.swift; sourceTree = "<group>"; };
+		37A8D0E122117D2C007A74F5 /* CodableInterception.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CodableInterception.framework; path = Carthage/Build/Mac/CodableInterception.framework; sourceTree = "<group>"; };
+		37A8D0E42211B0FF007A74F5 /* Fillable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fillable.swift; sourceTree = "<group>"; };
+		37A8D0E72211BAF3007A74F5 /* CodableInterception.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CodableInterception.framework; path = Carthage/Build/iOS/CodableInterception.framework; sourceTree = "<group>"; };
 		37D852A6220016210026B865 /* CyclicCoding.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CyclicCoding.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		37D852AE220016210026B865 /* CyclicCodingTests Mac.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "CyclicCodingTests Mac.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		37FEA54421F20501008112AD /* CycleBreaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleBreaker.swift; sourceTree = "<group>"; };
@@ -63,6 +72,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37A8D0E82211BAF3007A74F5 /* CodableInterception.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,6 +80,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37A8D0E92211BB1A007A74F5 /* CodableInterception.framework in Frameworks */,
 				372BDBC72129F13800E767AD /* CyclicCoding.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -78,6 +89,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37A8D0E222117D2C007A74F5 /* CodableInterception.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,6 +98,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				37D852AF220016210026B865 /* CyclicCoding.framework in Frameworks */,
+				37A8D0E322117E54007A74F5 /* CodableInterception.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -98,6 +111,7 @@
 				372BDBBF2129F13800E767AD /* CyclicCoding */,
 				372BDBCA2129F13800E767AD /* CyclicCodingTests */,
 				372BDBBE2129F13800E767AD /* Products */,
+				37A8D0E022117D2C007A74F5 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -118,6 +132,7 @@
 				372BDBC02129F13800E767AD /* CyclicCoding.h */,
 				372BDBDF212A80AA00E767AD /* Box.swift */,
 				37FEA54421F20501008112AD /* CycleBreaker.swift */,
+				37A8D0E42211B0FF007A74F5 /* Fillable.swift */,
 				372BDBD72129F1BD00E767AD /* CyclicEncoder.swift */,
 				3792D8B4212BD65200E68277 /* CyclicDecoder.swift */,
 				372BDBDB2129FDF700E767AD /* Primitive.swift */,
@@ -133,6 +148,15 @@
 				372BDBCD2129F13800E767AD /* Info.plist */,
 			);
 			path = CyclicCodingTests;
+			sourceTree = "<group>";
+		};
+		37A8D0E022117D2C007A74F5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				37A8D0E72211BAF3007A74F5 /* CodableInterception.framework */,
+				37A8D0E122117D2C007A74F5 /* CodableInterception.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -332,6 +356,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37A8D0E52211B0FF007A74F5 /* Fillable.swift in Sources */,
 				372BDBE0212A80AA00E767AD /* Box.swift in Sources */,
 				372BDBD82129F1BD00E767AD /* CyclicEncoder.swift in Sources */,
 				372BDBDC2129FDF700E767AD /* Primitive.swift in Sources */,
@@ -352,6 +377,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37A8D0E62211B164007A74F5 /* Fillable.swift in Sources */,
 				37D852BE220016CE0026B865 /* Box.swift in Sources */,
 				37D852C0220016CE0026B865 /* CyclicEncoder.swift in Sources */,
 				37D852BF220016CE0026B865 /* CycleBreaker.swift in Sources */,
@@ -517,8 +543,13 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = CyclicCoding/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -547,8 +578,13 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = CyclicCoding/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -572,11 +608,16 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = J67UWS3VAP;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = CyclicCodingTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
+					"$(FRAMEWORK_SEARCH_PATHS)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mostlyinfinite.CyclicCodingTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -593,11 +634,16 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = J67UWS3VAP;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = CyclicCodingTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
+					"$(FRAMEWORK_SEARCH_PATHS)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mostlyinfinite.CyclicCodingTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -618,6 +664,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = CyclicCoding/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -626,7 +676,7 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_BUNDLE_IDENTIFIER = co.omelaen.CyclicCoding;
 				PRODUCT_NAME = CyclicCoding;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -647,6 +697,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = CyclicCoding/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -655,7 +709,7 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_BUNDLE_IDENTIFIER = co.omelaen.CyclicCoding;
 				PRODUCT_NAME = CyclicCoding;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -673,11 +727,16 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = J67UWS3VAP;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				INFOPLIST_FILE = CyclicCodingTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
+					"$(FRAMEWORK_SEARCH_PATHS)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_BUNDLE_IDENTIFIER = co.omelaen.CyclicCodingTests;
@@ -696,11 +755,16 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = J67UWS3VAP;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				INFOPLIST_FILE = CyclicCodingTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
+					"$(FRAMEWORK_SEARCH_PATHS)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_BUNDLE_IDENTIFIER = co.omelaen.CyclicCodingTests;

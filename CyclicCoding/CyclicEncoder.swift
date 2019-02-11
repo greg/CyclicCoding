@@ -6,7 +6,7 @@
 //  Copyright © 2018 Greg Omelaenko. All rights reserved.
 //
 
-import Foundation
+import CodableInterception
 
 /// Encodes a given `Encodable` object graph, detecting duplicates and cycle, into a flattened representation suitable for serialisation.
 ///
@@ -46,7 +46,7 @@ fileprivate final class _Encoder: Encoder {
     /// For each object protected by a cycle breaker, the number of cycle breakers encountered.
     private var cycleBreakers: [ObjectIdentifier : Int]
     
-    private(set) var userInfo: [CodingUserInfoKey : Any]
+    let userInfo: [CodingUserInfoKey : Any]
     
     init(userInfo: [CodingUserInfoKey : Any]) {
         codingPath = []
@@ -58,9 +58,6 @@ fileprivate final class _Encoder: Encoder {
         referenced = []
         encodingStack = []
         cycleBreakers = [:]
-        
-        // overwrites that key in the dictionary, but people shouldn't really use a key with that name anyway
-        self.userInfo[cycleBreakerEncoderUserInfoKey] = self
     }
     
     func encodeRoot<T: Encodable>(_ value: T) throws -> FlattenedContainer {
@@ -152,7 +149,23 @@ extension _Encoder {
     }
     
     func box<T: Encodable>(_ value: T) throws -> Resolvable<ValueOrReference> {
-        if T.self is AnyClass {
+        func encodeCycleBreaker(objectIdentifier id: ObjectIdentifier?) throws -> Resolvable<ValueOrReference> {
+            id.map({ cycleBreakers[$0, default: 0] += 1 })
+            // when we actually box the cycle breaker, it will call encode again on its own for the actual value inside, and we'll encode a reference for that if needed
+            let r = try actuallyBox(value)
+            id.map({ cycleBreakers[$0]! -= 1 })
+            return r.map({ .value($0) })
+        }
+        if let cycleBreaker = value as? EncodableCycleBreaker {
+            return try encodeCycleBreaker(objectIdentifier: cycleBreaker.objectIdentifier)
+        }
+        else if let wrappedCycleBreaker = value as? EncodableWrapperProtocol {
+            // we prefer to use the underlying object identifier, because multiple wrappers could be created for the same object by a non-compliant third party.
+            // otherwise, we'll use the wrapped cycle breaker's id (or some random temporary one the AnyObject cast will generate for us if it's a struct).
+            // either way, the worst thing that happens is we fail to detect an undecodable cycle, and the user should find out about that soon enough anyway.
+            return try encodeCycleBreaker(objectIdentifier: wrappedCycleBreaker.underlyingObjectIdentifier ?? ObjectIdentifier(wrappedCycleBreaker as AnyObject))
+        }
+        else if T.self is AnyClass {
             // deduplicate objects
             let id = ObjectIdentifier(value as AnyObject)
             // we only allow cycles if there is an active cycle breaker to ensure it's actually possible to decode this later
@@ -205,17 +218,6 @@ extension _Encoder {
             // T is not a reference type
             return try actuallyBox(value).map { .value($0) }
         }
-    }
-    
-}
-
-extension _Encoder: CycleBreakerEncoder {
-    
-    func encodeBreakingCycle<T: Encodable & AnyObject>(_ value: T) throws {
-        let id = ObjectIdentifier(value)
-        cycleBreakers[id, default: 0] += 1
-        try encode(value)
-        cycleBreakers[id]! -= 1
     }
     
 }
@@ -518,10 +520,7 @@ fileprivate final class SuperEncoder: Encoder {
     }
     
     var userInfo: [CodingUserInfoKey : Any] {
-        // SuperEncoder does _not_ conform to CycleBreakerEncoder, and there is no need for it to
-        var userInfo = encoder.userInfo
-        userInfo[cycleBreakerEncoderUserInfoKey] = nil
-        return userInfo
+        return encoder.userInfo
     }
     
     func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key : CodingKey {

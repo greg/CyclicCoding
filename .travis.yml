@@ -4,8 +4,12 @@ osx_image: xcode10.1
 matrix:
   include:
   - script:
+    - brew install carthage
+    - carthage bootstrap
     - set -o pipefail && xcodebuild -project CyclicCoding.xcodeproj -scheme CyclicCoding\ Mac -destination platform\=macOS CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO build test | xcpretty
   - script:
+    - brew install carthage
+    - carthage bootstrap
     - set -o pipefail && xcodebuild -project CyclicCoding.xcodeproj -scheme CyclicCoding\ iOS -destination platform\=iOS\ Simulator,OS\=12.1,name\=iPhone\ X build test | xcpretty
 
 after_success:
