@@ -4,8 +4,8 @@ language: swift
 osx_image: xcode11
 en:
   - PROJECT_NAME=CyclicCoding
-install: (cd $PROJECT_NAME && swift package update)
+install: swift package update
 script:
-  - (cd $PROJECT_NAME && swift build)
-  - (cd $PROJECT_NAME && swift test)
+  - swift build
+  - swift test
 
