@@ -1,6 +1,5 @@
 # CyclicCoding
 
-[![Build Status](https://travis-ci.com/greg/CyclicCoding.svg?token=j2mxyGDSpdggCDnpjKs3&branch=master)](https://travis-ci.com/greg/CyclicCoding)
 [![codecov](https://codecov.io/gh/greg/CyclicCoding/branch/master/graph/badge.svg)](https://codecov.io/gh/greg/CyclicCoding)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
