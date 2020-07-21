@@ -268,8 +268,6 @@ fileprivate enum EncodingContainer {
 
 enum SuperKey: String, CodingKey {
     case `super` = "super"
-    
-    var intValue: Int { return 0 }
 }
 
 fileprivate struct KeyedContainerWrapper<Key>: KeyedEncodingContainerProtocol where Key: CodingKey {
